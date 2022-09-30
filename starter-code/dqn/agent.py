@@ -4,6 +4,8 @@ import numpy as np
 from dqn.model import DQN
 from dqn.replay_buffer import ReplayBuffer
 
+from torch.optim import Adam
+
 device = "cuda"
 
 
@@ -28,8 +30,18 @@ class DQNAgent:
         :param gamma: the discount factor
         """
 
-        # TODO: Initialise agent's networks, optimiser and replay buffer
-        raise NotImplementedError
+        # TODO: Initialise agent's networks, optimiser and replay buffer -> Done 
+        self.lr = lr
+        self.replay_buffer = replay_buffer
+        self.gamma = gamma
+        self.batch_size = batch_size
+        #agents networks
+        self.target_network = DQN(observation_space,action_space).to(device)
+        self.policy_network = DQN(observation_space,action_space).to(device)
+        #agents optimiser 
+        self.optimiser = Adam(self.policy_network.parameters(),lr=self.lr)
+        
+        # raise NotImplementedError
 
     def optimise_td_loss(self):
         """
@@ -48,7 +60,8 @@ class DQNAgent:
         """
         Update the target Q-network by copying the weights from the current Q-network
         """
-        # TODO update target_network parameters with policy_network parameters
+        # TODO update target_network parameters with policy_network parameters -> Done 
+        self.target_network.load_state_dict(self.policy_network.state_dict())
         raise NotImplementedError
 
     def act(self, state: np.ndarray):

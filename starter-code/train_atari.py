@@ -41,10 +41,13 @@ if __name__ == "__main__":
     #
     #
     #
+    env = WarpFrame(env) #-> warp frame to 84x84
+    env = PyTorchFrame(env) # turn to channel x height xwidth dimension for pytorch 
+    env = FrameStack(env,4) #take the last 4 frames 
 
     replay_buffer = ReplayBuffer(hyper_params["replay-buffer-size"])
 
-    # TODO Create dqn agent
+    # TODO Create dqn agent -> is double_dqn true or false
     # agent = DQNAgent( ... )
     agent = DQNAgent(env.observation_space,
         env.action_space,
@@ -64,7 +67,7 @@ if __name__ == "__main__":
             hyper_params["eps-end"] - hyper_params["eps-start"]
         )
         sample = random.random()
-        # TODO
+        # TODO done i think lol
         #  select random action if sample is less equal than eps_threshold
         # take step in env
         # add state, action, reward, next_state, float(done) to reply memory - cast done to float

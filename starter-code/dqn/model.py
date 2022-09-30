@@ -26,8 +26,10 @@ class DQN(nn.Module):
         ), "action_space must be of type Discrete"
 
         # TODO Implement DQN Network
+        return 
         raise NotImplementedError
 
     def forward(self, x):
         # TODO Implement forward pass
+        return
         raise NotImplementedError
