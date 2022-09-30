@@ -46,6 +46,13 @@ if __name__ == "__main__":
 
     # TODO Create dqn agent
     # agent = DQNAgent( ... )
+    agent = DQNAgent(env.observation_space,
+        env.action_space,
+        replay_buffer,
+        use_double_dqn=False,
+        lr=hyper_params["learning-rate"],
+        batch_size= hyper_params["batch-size"],
+        gamma=hyper_params["discount-factor"])
 
     eps_timesteps = hyper_params["eps-fraction"] * float(hyper_params["num-steps"])
     episode_rewards = [0.0]
@@ -62,6 +69,14 @@ if __name__ == "__main__":
         # take step in env
         # add state, action, reward, next_state, float(done) to reply memory - cast done to float
         # add reward to episode_reward
+        if sample < eps_threshold:
+            action = random.randrange(env.action_space.n)
+        else:
+            agent.act(state)
+
+        next_state, reward, done, _ = env.step(action) 
+        replay_buffer.add(state, action, reward, next_state, float(done))
+        state = next_state
 
         episode_rewards[-1] += reward
         if done:
