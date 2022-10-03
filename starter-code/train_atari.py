@@ -6,6 +6,7 @@ from dqn.agent import DQNAgent
 from dqn.replay_buffer import ReplayBuffer
 from dqn.wrappers import *
 
+
 if __name__ == "__main__":
 
     hyper_params = {

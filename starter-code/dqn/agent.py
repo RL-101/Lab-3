@@ -71,4 +71,11 @@ class DQNAgent:
         :return: the action to take
         """
         # TODO Select action greedily from the Q-network given the state
-        raise NotImplementedError
+        def policy_fn(sess, observation):
+            # A = np.ones(nA, dtype=float) * epsilon / nA
+            # q_values = estimator.predict(sess, np.expand_dims(observation, 0))[0]
+            best_action = np.argmax(q_values)
+            A[best_action] += (1.0 - epsilon)
+            return A
+        return policy_fn
+        # raise NotImplementedError
