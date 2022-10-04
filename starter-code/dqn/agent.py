@@ -70,12 +70,15 @@ class DQNAgent:
         :param state: the current state
         :return: the action to take
         """
-        # TODO Select action greedily from the Q-network given the state
-        def policy_fn(sess, observation):
-            # A = np.ones(nA, dtype=float) * epsilon / nA
-            # q_values = estimator.predict(sess, np.expand_dims(observation, 0))[0]
-            best_action = np.argmax(q_values)
-            A[best_action] += (1.0 - epsilon)
-            return A
-        return policy_fn
-        # raise NotImplementedError
+        # make rgb values have a range of [0,1]
+        state = state/255.0
+        # convert state to tensor object and put on GPU
+        state = torch.from_numpy(state).float().unsqueeze(0).to(device)
+        # making sure gradients aren't saved for the following calculations
+        with torch.no_grad():
+            # get action-state values using the foward pass of the network
+            qs = self.policy_network(state)
+            # get max action
+            _, action = qs.max(1)
+            # return action from tensor object
+            return action.item()
