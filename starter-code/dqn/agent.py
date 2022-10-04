@@ -50,7 +50,7 @@ class DQNAgent:
         Optimise the TD-error over a single minibatch of transitions
         :return: the loss
         """
-        # TODO
+        # TODO -> done
         #   Optimise the TD-error over a single minibatch of transitions
         #   Sample the minibatch from the replay-memory
         #   using done (as a float) instead of if statement
@@ -82,9 +82,9 @@ class DQNAgent:
                 # if not done
                 target += self.gamma * estimate
 
-        new_estimate = self.policy_network(tensor_next_states).gather(1, tensor_actions.unsqueeze(1)).squeeze()
 
         # backpropagation
+        new_estimate = self.policy_network(tensor_next_states).gather(1, tensor_actions.unsqueeze(1)).squeeze()
         loss = nn.MSELoss(new_estimate, target)
         loss.backward()
         self.optimiser.step()
