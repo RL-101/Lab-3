@@ -25,23 +25,20 @@ class DQN(nn.Module):
             type(action_space) == spaces.Discrete
         ), "action_space must be of type Discrete"
 
-        # TODO Implement DQN Network
-        self.conv = nn.Sequential(
-            nn.Conv2d(in_channels=observation_space.shape[0], out_channels=32, kernel_size=8, stride=4),
+        self.convolutions = nn.Sequential(
+            nn.Conv2d(observation_space.shape[0], 16, 8, stride=4),
             nn.ReLU(),
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=4, stride=2),
-            nn.ReLU(),
-            nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1),
+            nn.Conv2d(16, 32, 4, stride=2),
             nn.ReLU()
         )
 
-        self.fc = nn.Sequential(
-            nn.Linear(in_features=64*7*7 , out_features=512),
+        self.fully_connected_layer = nn.Sequential(
+            nn.Linear(in_features=32*9*9 , out_features=256),
             nn.ReLU(),
-            nn.Linear(in_features=512, out_features=action_space.n)
+            nn.Linear(in_features=256, out_features=action_space.n)
         )
 
     def forward(self, x):
-        # TODO Implement forward pass
-        conv_out = self.conv(x).view(x.size()[0],-1)
-        return self.fc(conv_out)
+        output = self.convolutions(x).view(x.size()[0],-1)
+        output = self.fully_connected_layer(output)
+        return output
