@@ -5,6 +5,7 @@ from dqn.model import DQN
 from dqn.replay_buffer import ReplayBuffer
 
 from torch.optim import Adam
+from torch import nn
 
 device = "cuda"
 
@@ -35,6 +36,7 @@ class DQNAgent:
         self.replay_buffer = replay_buffer
         self.gamma = gamma
         self.batch_size = batch_size
+        self.use_double_dqn = use_double_dqn
         #agents networks
         self.target_network = DQN(observation_space,action_space).to(device)
         self.policy_network = DQN(observation_space,action_space).to(device)
@@ -54,7 +56,45 @@ class DQNAgent:
         #   using done (as a float) instead of if statement
         #   return loss
 
-        raise NotImplementedError
+        # get batch from replay buffer and convert info into tensors
+        states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
+        tensor_states = torch.from_numpy(np.array(states)/255.0).float().to(device)
+        tensor_next_states = torch.from_numpy(np.array(next_states)/255.0).float().to(device)
+        tensor_actions = torch.from_numpy(actions).long().to(device)
+        tensor_rewards = torch.from_numpy(rewards).float().to(device)
+        tensor_dones = torch.from_numpy(dones).float().to(device)
+
+        # don't track gradients
+        with torch.no_grad():
+            # calculate target
+            estimate = None
+            if self.use_double_dqn:
+                # get next action from the other network
+                _, next_action = self.policy_network(tensor_next_states).max(1)
+                # get next q from target network
+                estimate = self.target_network(tensor_next_states).gather(1, next_action.unsqueeze(1)).squeeze()
+            else:
+                # get next q from target network
+                estimate = self.target_network(tensor_next_states).max(1)
+
+            target = tensor_rewards
+            if tensor_dones != 1:
+                # if not done
+                target += self.gamma * estimate
+
+        new_estimate = self.policy_network(tensor_next_states).gather(1, tensor_actions.unsqueeze(1)).squeeze()
+
+        # backpropagation
+        loss = nn.MSELoss(new_estimate, target)
+        loss.backward()
+        self.optimiser.step()
+        self.optimiser.zero_grad()
+
+        # remove from GPU
+        del tensor_states
+        del tensor_next_states
+
+        return loss.item()
 
     def update_target_network(self):
         """
@@ -62,7 +102,6 @@ class DQNAgent:
         """
         # TODO update target_network parameters with policy_network parameters -> Done 
         self.target_network.load_state_dict(self.policy_network.state_dict())
-        raise NotImplementedError
 
     def act(self, state: np.ndarray):
         """

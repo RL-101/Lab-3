@@ -39,6 +39,6 @@ class DQN(nn.Module):
         )
 
     def forward(self, x):
-        output = self.convolutions(x).view(x.size()[0],-1)
-        output = self.fully_connected_layer(output)
+        output = self.convolutions(x)
+        output = self.fully_connected_layer(output.view(x.size()[0],-1))
         return output
