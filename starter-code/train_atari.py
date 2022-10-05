@@ -45,6 +45,7 @@ if __name__ == "__main__":
     env = WarpFrame(env) #-> warp frame to 84x84
     env = PyTorchFrame(env) # turn to channel x height xwidth dimension for pytorch 
     env = FrameStack(env,4) #take the last 4 frames 
+    env = ClipRewardEnv(env)
 
     replay_buffer = ReplayBuffer(hyper_params["replay-buffer-size"])
 

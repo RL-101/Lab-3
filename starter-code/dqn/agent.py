@@ -6,6 +6,9 @@ from dqn.replay_buffer import ReplayBuffer
 
 from torch.optim import Adam
 from torch import nn
+import torch
+
+import torch.nn.functional as F
 
 device = "cuda"
 
@@ -77,15 +80,13 @@ class DQNAgent:
                 # get next q from target network
                 estimate = self.target_network(tensor_next_states).max(1)
 
-            target = tensor_rewards
-            if tensor_dones != 1:
-                # if not done
-                target += self.gamma * estimate
+            c = self.gamma * estimate[0]
+            target = tensor_rewards + (1 - tensor_dones) * c
 
 
         # backpropagation
         new_estimate = self.policy_network(tensor_next_states).gather(1, tensor_actions.unsqueeze(1)).squeeze()
-        loss = nn.MSELoss(new_estimate, target)
+        loss = F.smooth_l1_loss(new_estimate, target)
         loss.backward()
         self.optimiser.step()
         self.optimiser.zero_grad()
@@ -110,7 +111,7 @@ class DQNAgent:
         :return: the action to take
         """
         # make rgb values have a range of [0,1]
-        state = state/255.0
+        state = np.array(state)/255.0
         # convert state to tensor object and put on GPU
         state = torch.from_numpy(state).float().unsqueeze(0).to(device)
         # making sure gradients aren't saved for the following calculations

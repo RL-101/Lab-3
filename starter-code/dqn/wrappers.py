@@ -8,6 +8,8 @@ import gym
 from gym import spaces
 import cv2
 
+import random
+
 cv2.ocl.setUseOpenCL(False)
 
 
@@ -28,7 +30,7 @@ class NoopResetEnv(gym.Wrapper):
         if self.override_num_noops is not None:
             noops = self.override_num_noops
         else:
-            noops = self.unwrapped.np_random.randint(
+            noops = random.randint(
                 1, self.noop_max + 1
             )  # pylint: disable=E1101
         assert noops > 0
