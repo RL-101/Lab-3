@@ -49,12 +49,12 @@ if __name__ == "__main__":
 
     replay_buffer = ReplayBuffer(hyper_params["replay-buffer-size"])
 
-    # TODO Create dqn agent -> is double_dqn true or false
+    # TODO Create dqn agent
     # agent = DQNAgent( ... )
     agent = DQNAgent(env.observation_space,
         env.action_space,
         replay_buffer,
-        use_double_dqn=False,
+        use_double_dqn=hyper_params["use-double-dqn"],
         lr=hyper_params["learning-rate"],
         batch_size= hyper_params["batch-size"],
         gamma=hyper_params["discount-factor"])
