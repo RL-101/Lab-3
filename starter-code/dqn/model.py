@@ -29,11 +29,13 @@ class DQN(nn.Module):
             nn.Conv2d(observation_space.shape[0], 16, 8, stride=4),
             nn.ReLU(),
             nn.Conv2d(16, 32, 4, stride=2),
-            nn.ReLU()
+            nn.ReLU(),
+            nn.Conv2d(32, 32, 3, stride=1),
+            nn.ReLU(),
         )
 
         self.fully_connected_layer = nn.Sequential(
-            nn.Linear(in_features=32*9*9 , out_features=256),
+            nn.Linear(in_features=32*7*7 , out_features=256),
             nn.ReLU(),
             nn.Linear(in_features=256, out_features=action_space.n)
         )
