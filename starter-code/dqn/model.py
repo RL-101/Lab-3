@@ -56,9 +56,9 @@ class DQN(nn.Module):
         )
 
         self.fully_connected_layer = nn.Sequential(
-            # 49 games were played -> 7x7
+            # 49 games were considered -> 7x7
             # 
-            nn.Linear(in_features=32*7*7 , out_features=256),
+            nn.Linear(in_features=64*7*7 , out_features=256),
             nn.ReLU(),
             nn.Linear(in_features=256, out_features=action_space.n)
         )
