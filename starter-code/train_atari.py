@@ -44,7 +44,7 @@ if __name__ == "__main__":
     env = FrameStack(env,4) #take the last 4 frames 
     env = ClipRewardEnv(env)
     # record video every 50 episodes
-    env = gym.wrappers.Monitor(env, './video/', video_callable=lambda episode_id: episode_id % 50 == 0, force=True)
+    env = gym.wrappers.Monitor(env, './videos/', video_callable=lambda episode_id: episode_id % 50 == 0, force=True)
     
     replay_buffer = ReplayBuffer(hyper_params["replay-buffer-size"])
 
