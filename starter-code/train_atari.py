@@ -6,7 +6,6 @@ from dqn.agent import DQNAgent
 from dqn.replay_buffer import ReplayBuffer
 from dqn.wrappers import *
 
-
 if __name__ == "__main__":
 
     hyper_params = {
@@ -16,9 +15,9 @@ if __name__ == "__main__":
         "learning-rate": 1e-4,  # learning rate for Adam optimizer
         "discount-factor": 0.99,  # discount factor
         "num-steps": int(1e6),  # total number of steps to run the environment for
-        "batch-size": 256,  # number of transitions to optimize at the same time
+        "batch-size": 32,  # number of transitions to optimize at the same time
         "learning-starts": 10000,  # number of steps before learning starts
-        "learning-freq": 5,  # number of iterations between every optimization step
+        "learning-freq": 1,  # number of iterations between every optimization step
         "use-double-dqn": True,  # use double deep Q-learning
         "target-update-freq": 1000,  # number of iterations between every target network update
         "eps-start": 1.0,  # e-greedy start threshold
@@ -31,26 +30,25 @@ if __name__ == "__main__":
     random.seed(hyper_params["seed"])
 
     assert "NoFrameskip" in hyper_params["env"], "Require environment with no frameskip"
+    
     env = gym.make(hyper_params["env"])
     env.seed(hyper_params["seed"])
 
+    # TODO Pick Gym wrappers to use
     env = NoopResetEnv(env, noop_max=30)
     env = MaxAndSkipEnv(env, skip=4)
     env = EpisodicLifeEnv(env)
     env = FireResetEnv(env)
-    # TODO Pick Gym wrappers to use
-    #
-    #
-    #
     env = WarpFrame(env) #-> warp frame to 84x84
     env = PyTorchFrame(env) # turn to channel x height xwidth dimension for pytorch 
     env = FrameStack(env,4) #take the last 4 frames 
     env = ClipRewardEnv(env)
-
+    # record video every 50 episodes
+    env = gym.wrappers.Monitor(env, './video/', video_callable=lambda episode_id: episode_id % 50 == 0, force=True)
+    
     replay_buffer = ReplayBuffer(hyper_params["replay-buffer-size"])
 
     # TODO Create dqn agent
-    # agent = DQNAgent( ... )
     agent = DQNAgent(env.observation_space,
         env.action_space,
         replay_buffer,
@@ -79,6 +77,7 @@ if __name__ == "__main__":
         else:
             agent.act(state)
 
+        #take next step
         next_state, reward, done, _ = env.step(action) 
         replay_buffer.add(state, action, reward, next_state, float(done))
         state = next_state
@@ -114,3 +113,4 @@ if __name__ == "__main__":
             print("mean 100 episode reward: {}".format(mean_100ep_reward))
             print("% time spent exploring: {}".format(int(100 * eps_threshold)))
             print("********************************************************")
+            np.savetxt('rewards.csv', episode_rewards)
