@@ -50,17 +50,15 @@ class DQN(nn.Module):
             #  idk if this understanding is correct
             nn.Conv2d(32, 64, 4, stride=2),
             nn.ReLU(),
-            #  final hidden layer is fully connected with 256 rectifier units
+            #  final hidden layer is fully connected with 256 rectifier units -> mnih paper has 512 
             nn.Conv2d(64, 64, 3, stride=1),
             nn.ReLU(),
         )
 
         self.fully_connected_layer = nn.Sequential(
-            # 49 games were considered -> 7x7
-            # 
-            nn.Linear(in_features=64*7*7 , out_features=256),
+            nn.Linear(in_features=64*7*7 , out_features=512), #512 not 256 
             nn.ReLU(),
-            nn.Linear(in_features=256, out_features=action_space.n)
+            nn.Linear(in_features=512, out_features=action_space.n)
         )
 
     def forward(self, x):
