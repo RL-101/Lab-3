@@ -75,11 +75,11 @@ if __name__ == "__main__":
         if sample < eps_threshold:
             action = random.randrange(env.action_space.n)
         else:
-            agent.act(state)
+            action = agent.act(state)
 
         #take next step
         next_state, reward, done, _ = env.step(action) 
-        replay_buffer.add(state, action, reward, next_state, float(done))
+        agent.replay_buffer.add(state, action, reward, next_state, float(done))
         state = next_state
 
         episode_rewards[-1] += reward
