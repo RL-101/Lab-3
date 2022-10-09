@@ -42,7 +42,7 @@ if __name__ == "__main__":
     env = WarpFrame(env) #-> warp frame to 84x84
     env = PyTorchFrame(env) # turn to channel x height xwidth dimension for pytorch 
     env = FrameStack(env,4) #take the last 4 frames 
-    env = ClipRewardEnv(env)
+    # env = ClipRewardEnv(env)
     # record video every 50 episodes
     env = gym.wrappers.Monitor(env, './videos/', video_callable=lambda episode_id: episode_id % 50 == 0, force=True)
     
@@ -67,7 +67,7 @@ if __name__ == "__main__":
             hyper_params["eps-end"] - hyper_params["eps-start"]
         )
         sample = random.random()
-        # TODO done i think lol
+        # TODO done 
         #  select random action if sample is less equal than eps_threshold
         # take step in env
         # add state, action, reward, next_state, float(done) to reply memory - cast done to float
