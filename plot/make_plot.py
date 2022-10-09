@@ -1,10 +1,11 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
-rewards = pd.read_csv("./rewards.csv") 
+rewards = pd.read_csv("/content/drive/Shareddrives/Reinforcement_Learning/rewards.csv") 
 rewards = rewards.to_numpy()
-plt.plot([i+1 for i in range(0, 145)], rewards[::2])
+
+plt.plot([i for i in range(len(rewards))], rewards)
 plt.xlabel('Episode no.')
-plt.ylabel('Time spent to reach the flag')
+plt.ylabel('Reward of DQN')
 plt.show()
+print()
