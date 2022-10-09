@@ -18,7 +18,7 @@ if __name__ == "__main__":
         "batch-size": 32,  # number of transitions to optimize at the same time
         "learning-starts": 10000,  # number of steps before learning starts
         "learning-freq": 1,  # number of iterations between every optimization step
-        "use-double-dqn": True,  # use double deep Q-learning
+        "use-double-dqn": False,  # use double deep Q-learning
         "target-update-freq": 1000,  # number of iterations between every target network update
         "eps-start": 1.0,  # e-greedy start threshold
         "eps-end": 0.01,  # e-greedy end threshold

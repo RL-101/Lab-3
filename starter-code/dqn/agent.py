@@ -13,6 +13,7 @@ import torch.nn.functional as F
 device = "cuda"
 
 
+
 class DQNAgent:
     def __init__(
         self,
@@ -61,8 +62,8 @@ class DQNAgent:
 
         # get batch from replay buffer and convert info into tensors
         states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
-        tensor_states = torch.from_numpy(np.array(states)/255.0).float().to(device)
-        tensor_next_states = torch.from_numpy(np.array(next_states)/255.0).float().to(device)
+        tensor_states = torch.from_numpy(states/255.0).float().to(device)
+        tensor_next_states = torch.from_numpy(next_states/255.0).float().to(device)
         tensor_actions = torch.from_numpy(actions).long().to(device)
         tensor_rewards = torch.from_numpy(rewards).float().to(device)
         tensor_dones = torch.from_numpy(dones).float().to(device)
@@ -73,27 +74,30 @@ class DQNAgent:
             estimate = None
             if self.use_double_dqn:
                 # get next action from the other network
-                _, next_action = self.policy_network(tensor_next_states).max(1)
+                _, next_action = self.policy_network(tensor_states).max(1)
                 # get next q from target network
                 estimate = self.target_network(tensor_next_states).gather(1, next_action.unsqueeze(1)).squeeze()
             else:
+                estimate = None
+              
                 # get next q from target network
-                estimate = self.target_network(tensor_next_states).max(1)
+                
 
-            c = self.gamma * estimate[0]
-            target = tensor_rewards + (1 - tensor_dones) * c
+        estimate = self.target_network(tensor_next_states).max(1)
 
+        c = self.gamma * estimate[0]
+        target = tensor_rewards + (1 - tensor_dones) * c
 
         # backpropagation
-        new_estimate = self.policy_network(tensor_next_states).gather(1, tensor_actions.unsqueeze(1)).squeeze()
-        loss = F.smooth_l1_loss(new_estimate, target)
+        new_estimate = self.policy_network(tensor_states).gather(1, tensor_actions.unsqueeze(1)).squeeze()
+        loss = nn.functional.l1_loss(new_estimate, target)
+        self.optimiser.zero_grad()
         loss.backward()
         self.optimiser.step()
-        self.optimiser.zero_grad()
 
-        # remove from GPU
-        del tensor_states
-        del tensor_next_states
+        # # remove from GPU
+        # del tensor_states
+        # del tensor_next_states
 
         return loss.item()
 
